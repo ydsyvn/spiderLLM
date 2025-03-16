@@ -3,3 +3,10 @@
 
 # Ignore virtual enviroment
 /venv
+
+# Ignore pycache
+/tests/__pycache__
+
+/knot theory
+
+/models
