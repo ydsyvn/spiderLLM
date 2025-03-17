@@ -1,29 +1,53 @@
 import ollama
+import PyPDF2
 
 LANGUAGE_MODEL = 'tinyllama:latest'
 EMBEDDING_MODEL = 'hf.co/CompendiumLabs/bge-base-en-v1.5-gguf'
 
-# load dataset
+""" # load dataset
 with open('knot theory/ambitious_antrepreneur.txt', 'r') as file:
     dataset = file.read()
     print(f'Loaded {len(dataset)} characters.')
+     """
+     
+
+def extract_text_from_pdf(pdf_path):
+    with open(pdf_path, 'rb') as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text() + "\n"
+    return text
+
+celtic_knots_pdf = 'knot theory/celtic_knots.pdf'
+protiens_pdf = 'knot theory/protiens.pdf'
+quantum_computing_pdf = 'knot theory/quantum_computing.pdf'
+
+celtic_knots_text = extract_text_from_pdf(celtic_knots_pdf)
+protiens_text = extract_text_from_pdf(protiens_pdf)
+quantum_computing_text = extract_text_from_pdf(quantum_computing_pdf)
+
+dataset = [celtic_knots_text, protiens_text, quantum_computing_text]
 
 # calculate chunk embeddings
 vector_db = []
 
 def add_chunk_to_db(chunk):
-    embedding_test = ollama.embed(EMBEDDING_MODEL, chunk)
     embedding = ollama.embed(EMBEDDING_MODEL, chunk)['embeddings'][0]
     
     vector_db.append((chunk, embedding))
 
 # split data to chunks and add to db
-chunks = dataset.split('.')
-for i, chunk in enumerate(chunks):
-    if chunk:
-        add_chunk_to_db(chunk)
+def split_to_chunks(dataset):
+    for document in dataset:    
+        chunks = document.split('.')
+        for i, chunk in enumerate(chunks):
+            if chunk:
+                add_chunk_to_db(chunk)
+        print(f'Added {i+1} chunks to the db.')
+        
 
-print(f'Added {i+1} chunks to the db.')
+split_to_chunks(dataset)
 
 # define cosine similarity
 def cosine_similarity(a, b):

@@ -1,4 +1,9 @@
 - Add pdf support
 - Improve chunk splitting
 - Add web search
+- Add keyword search to improve the rag
+- Add references
+- Make cli interface prettier and add option to continue chatting.
+- Save vectors in a database
+- Add visualizations for cosine similarity
 -
